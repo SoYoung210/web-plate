@@ -40,31 +40,23 @@ module.exports = (env, options) => {
 						{
 							loader: 'css-loader',
 							options: {
-								importLoaders: 1,
-								modules: true,
-								localIdentName: '[path]_[local]',
-								sourceMap: true,
+                sourceMap: true,
+                modules: {
+                  localIdentName: '[local]_[hash:base64:5]',
+                }
 							},
 						},
-						'postcss-loader',
+						{
+              loader: 'postcss-loader',
+              options: {
+                sourceMap: true,
+              },
+            },
 					],
 				},
 				{
 					test: /\.(gif|png|jpe?g)$/i,
 					use: ['file-loader'],
-				},
-				{
-					test: /\.less$/,
-					use: [
-						'style-loader',
-						'css-loader',
-						{
-							loader: 'less-loader',
-							options: {
-								javascriptEnabled: true,
-							},
-						},
-					],
 				},
 				{
 					test: /\.svg$/,
