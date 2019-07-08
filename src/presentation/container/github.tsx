@@ -3,22 +3,32 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootStoreState } from '@/store/reducers';
 import { loadingState } from '@/store/_modules/loading';
 import { IMyGitHubState, myGitHub, GITHUB_PREFIX } from '@/store/github';
+import { useDebounce } from '@/_util/hooks';
 
 const mockImageUrl = 'https://camo.githubusercontent.com/7c14d0bf0e0ffdccc1f8e91db35cb4b39e62b03e/68747470733a2f2f73332e61702d6e6f727468656173742d322e616d617a6f6e6177732e636f6d2f7261696e6973742d696e7465726e616c2f746563686e6963616c2d696e746572766965772d696e737472756374696f6e732f776972656672616d652e737667';
 
 const MyGitHubContainer: React.FC = () => {
   const [targetName, setTargetName] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const isLoading = useSelector<RootStoreState, loadingState>(state => state.loading)
   const { contents } = useSelector<RootStoreState, IMyGitHubState>(
     state => state[GITHUB_PREFIX],
   );
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+  const debouncedSearchTerm = useDebounce(targetName, 1500);
 
   useEffect(() => {
-    console.log('t',targetName)
-    dispatch(myGitHub.fetch(targetName))
-  }, [targetName])
+    if (!targetName) {
+      return;
+    }
+
+    if (debouncedSearchTerm) {
+      setIsSearching(true);
+      dispatch(myGitHub.fetch(targetName))
+    }
+
+  }, [debouncedSearchTerm])
 
   if (isLoading[GITHUB_PREFIX]) {
     return <div>Loading...</div>
@@ -32,18 +42,13 @@ const MyGitHubContainer: React.FC = () => {
           setTargetName(e.target.value)}
         } />
       </div>
-      <div>
-        <span>NAME: </span>
-        {contents.login}
-      </div>
-      <div>
-        <span>URL: </span>
-        {contents.html_url}
-      </div>
-      <div>
-        <span>BLOG: </span>
-        {contents.blog}
-      </div>
+      {
+        contents.items && contents.items.map((value:any, index: number) => (
+          <div>
+            <img src={value.avatar_url} alt="profile_image" />
+          </div>
+        ))
+      }
       <img src={contents.avatar_url} alt="profile_image" />
       <img src={mockImageUrl}/>
       <p>
