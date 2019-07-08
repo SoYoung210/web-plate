@@ -8,8 +8,9 @@ import { emptyList } from '@/_util';
 
 export const GITHUB_PREFIX = ACTION_TYPES.GITHUB;
 
-interface IMyGitHubRequest {
+export interface IMyGitHubRequest {
   targetName: string;
+  userType: SEARCH_TYPE;
 }
 
 interface IGitHubContents {
@@ -25,9 +26,16 @@ export interface IMyGitHubState {
   errorMessage: string
 }
 
+export enum SEARCH_TYPE {
+  USER = 'user',
+  ORG = 'org',
+  ALL = 'all'
+}
+
 const initialState: IMyGitHubState = {
   requestPayload: {
     targetName: '',
+    userType: SEARCH_TYPE.ALL,
   },
   contents: emptyList(),
   errorMessage: '',
@@ -40,9 +48,7 @@ const reducer = {
 
     return {
       ...state,
-      requestPayload: {
-        targetName: action.payload
-      }
+      requestPayload: action.payload
     }
   },
   [myGitHub.SUCCESS]: (state: IMyGitHubState, action: ActionType) => ({
