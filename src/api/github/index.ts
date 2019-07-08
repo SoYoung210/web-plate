@@ -1,7 +1,7 @@
-import { ajax, AjaxResponse } from 'rxjs/ajax';
+import { ajax } from 'rxjs/ajax';
 
-export function getMyGitHubProfile() {
-  const response = ajax.getJSON('https://api.github.com/users/SoYoung210');
+export function getMyGitHubProfile(targetName: any) {
+  const response = ajax.getJSON(`https://api.github.com/users/search/users?q=${targetName}`);
   
   return response
 }

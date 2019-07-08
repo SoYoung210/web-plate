@@ -4,6 +4,7 @@ import { switchMap,map, catchError } from 'rxjs/operators';
 import { AjaxError } from 'rxjs/ajax';
 import { startLoading } from './loading';
 import { Epic, ofType } from 'redux-observable';
+import { ActionType } from '../_types/actionTypes';
 
 export const createAsyncAction = (type: string) =>  {
   const FETCH = `${type}/FETCH`
@@ -23,13 +24,13 @@ export const createAsyncAction = (type: string) =>  {
 export const createAsyncEpic = (type: string, req: (payload: any) => Observable<any>) => {
   const actions = createAsyncAction(type);
 
-  const epic: Epic = (action$: any) => {
-    const payload = (action$ && action$.payload) || null;
+  const epic: Epic = (action$: any, state) => {
 
     return action$.pipe(
       ofType(actions.FETCH),
-      switchMap(() => {
+      switchMap((action: ActionType) => {
         startLoading(type);
+        const payload = (action && action.payload) || null;
         return req(payload).pipe(
           map((res: any) => {
             return actions.success(res);

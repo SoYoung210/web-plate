@@ -3,9 +3,12 @@ import { ACTION_TYPES } from "../_types/constants";
 import { createAsyncAction, createAsyncEpic } from '../_modules/actionUtils';
 import { ActionType } from "../_types/actionTypes";
 import { getMyGitHubProfile } from '@/api/github';
-import { from } from 'rxjs';  
 
 export const GITHUB_PREFIX = ACTION_TYPES.GITHUB;
+
+interface IMyGitHubRequest {
+  targetName: string;
+}
 
 interface IGitHubContents {
   login: string
@@ -15,11 +18,15 @@ interface IGitHubContents {
 }
 
 export interface IMyGitHubState {
+  requestPayload: IMyGitHubRequest
   contents: IGitHubContents
   errorMessage: string
 }
 
 const initialState: IMyGitHubState = {
+  requestPayload: {
+    targetName: '',
+  },
   contents: {
     login: '',
     html_url: '',
@@ -32,6 +39,15 @@ const initialState: IMyGitHubState = {
 export const myGitHub = createAsyncAction(GITHUB_PREFIX);
 
 const reducer = {
+  [myGitHub.FETCH]: (state: IMyGitHubState, action: ActionType) => {
+   
+    return {
+      ...state,
+      requestPayload: {
+        targetName: action.payload
+      }
+    }
+  },
   [myGitHub.SUCCESS]: (state: IMyGitHubState, action: ActionType) => ({
     ...state,
     contents: action.payload,

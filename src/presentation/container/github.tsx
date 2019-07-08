@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootStoreState } from '@/store/reducers';
 import { loadingState } from '@/store/_modules/loading';
 import { IMyGitHubState, myGitHub, GITHUB_PREFIX } from '@/store/github';
 
+const mockImageUrl = 'https://camo.githubusercontent.com/7c14d0bf0e0ffdccc1f8e91db35cb4b39e62b03e/68747470733a2f2f73332e61702d6e6f727468656173742d322e616d617a6f6e6177732e636f6d2f7261696e6973742d696e7465726e616c2f746563686e6963616c2d696e746572766965772d696e737472756374696f6e732f776972656672616d652e737667';
+
 const MyGitHubContainer: React.FC = () => {
+  const [targetName, setTargetName] = useState('');
   const isLoading = useSelector<RootStoreState, loadingState>(state => state.loading)
   const { contents } = useSelector<RootStoreState, IMyGitHubState>(
     state => state[GITHUB_PREFIX],
@@ -13,8 +16,9 @@ const MyGitHubContainer: React.FC = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(myGitHub.fetch())
-  }, [dispatch])
+    console.log('t',targetName)
+    dispatch(myGitHub.fetch(targetName))
+  }, [targetName])
 
   if (isLoading[GITHUB_PREFIX]) {
     return <div>Loading...</div>
@@ -22,6 +26,12 @@ const MyGitHubContainer: React.FC = () => {
   
   return (
     <div>
+      <div>
+        <input value={targetName} onChange={(e) => {
+          console.log(e.target.value)
+          setTargetName(e.target.value)}
+        } />
+      </div>
       <div>
         <span>NAME: </span>
         {contents.login}
@@ -35,6 +45,20 @@ const MyGitHubContainer: React.FC = () => {
         {contents.blog}
       </div>
       <img src={contents.avatar_url} alt="profile_image" />
+      <img src={mockImageUrl}/>
+      <p>
+        Github User 또는 Organization의 이름을 검색할 수 있습니다. <br/>
+        검색은 Github User Search API를 이용하여 구현합니다.<br/>
+        검색 결과는 하단에 Grid로 표현되며 type에 따라 다른 형태로 표현됩니다.<br/>
+        Organization은 avatar_url 값을 이용하여 프로필 이미지를 표시합니다.<br/>
+        User는 login 값을 이용하여 사용자 이름을 표시합니다.<br/>
+        검색 필터를 설정할 수 있습니다.<br/>
+        검색 대상 선택 (User, Organization)<br/>
+        검색 대상을 선택하지 않았을 경우에는 전체를 대상으로 검색합니다.<br/>
+        보유 레포지토리 수를 조건으로 검색<br/><br/>
+        보유 레포지토리 개수가 입력된 숫자 값 이상인 대상으로 검색합니다.<br/>
+        API를 일정 시간 내 계속해서 호출 시 차단이 될 수 있습니다.<br/>
+      </p>
     </div>
   )
 }
