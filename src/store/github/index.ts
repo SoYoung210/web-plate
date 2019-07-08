@@ -3,6 +3,8 @@ import { ACTION_TYPES } from "../_types/constants";
 import { createAsyncAction, createAsyncEpic } from '../_modules/actionUtils';
 import { ActionType } from "../_types/actionTypes";
 import { getMyGitHubProfile } from '@/api/github';
+import { List } from 'immutable';
+import { emptyList } from '@/_util';
 
 export const GITHUB_PREFIX = ACTION_TYPES.GITHUB;
 
@@ -19,7 +21,7 @@ interface IGitHubContents {
 
 export interface IMyGitHubState {
   requestPayload: IMyGitHubRequest
-  contents: IGitHubContents
+  contents: List<IGitHubContents>
   errorMessage: string
 }
 
@@ -27,12 +29,7 @@ const initialState: IMyGitHubState = {
   requestPayload: {
     targetName: '',
   },
-  contents: {
-    login: '',
-    html_url: '',
-    blog: '',
-    avatar_url: '',
-  },
+  contents: emptyList(),
   errorMessage: '',
 }
 
@@ -40,7 +37,7 @@ export const myGitHub = createAsyncAction(GITHUB_PREFIX);
 
 const reducer = {
   [myGitHub.FETCH]: (state: IMyGitHubState, action: ActionType) => {
-   
+
     return {
       ...state,
       requestPayload: {
