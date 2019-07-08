@@ -1,5 +1,5 @@
 import { createAction } from 'redux-actions';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { switchMap,map, catchError } from 'rxjs/operators';
 import { AjaxError } from 'rxjs/ajax';
 import { startLoading } from './loading';
@@ -20,23 +20,23 @@ export const createAsyncAction = (type: string) =>  {
   }
 }
 
-export const createAsyncEpic = (type: string, req: any) => {
+export const createAsyncEpic = (type: string, req: (payload: any) => Observable<any>) => {
   const actions = createAsyncAction(type);
-  
+
   const epic: Epic = (action$: any) => {
     const payload = (action$ && action$.payload) || null;
 
     return action$.pipe(
       ofType(actions.FETCH),
-      startLoading(type),
       switchMap(() => {
+        startLoading(type);
         return req(payload).pipe(
           map((res: any) => {
-            actions.success(res);
+            return actions.success(res);
           }),
-          catchError((error: AjaxError) => of(
-            actions.failure(error)
-          ))
+          catchError((error: AjaxError) => {
+            return of(actions.failure(error)
+          )})
         )
       }),
 

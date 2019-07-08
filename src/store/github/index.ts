@@ -3,8 +3,9 @@ import { ACTION_TYPES } from "../_types/constants";
 import { createAsyncAction, createAsyncEpic } from '../_modules/actionUtils';
 import { ActionType } from "../_types/actionTypes";
 import { getMyGitHubProfile } from '@/api/github';
+import { from } from 'rxjs';  
 
-export const PREFIX = ACTION_TYPES.GITHUB;
+export const GITHUB_PREFIX = ACTION_TYPES.GITHUB;
 
 interface IGitHubContents {
   login: string
@@ -28,18 +29,18 @@ const initialState: IMyGitHubState = {
   errorMessage: '',
 }
 
-const myGithub = createAsyncAction(PREFIX);
+export const myGitHub = createAsyncAction(GITHUB_PREFIX);
 
 const reducer = {
-  [myGithub.SUCCESS]: (state: IMyGitHubState, action: ActionType) => ({
+  [myGitHub.SUCCESS]: (state: IMyGitHubState, action: ActionType) => ({
     ...state,
     contents: action.payload,
   }),
-  [myGithub.FAILURE]: (state: IMyGitHubState, action: ActionType) => ({
+  [myGitHub.FAILURE]: (state: IMyGitHubState, action: ActionType) => ({
     ...state,
     errorMessage: action.payload,
   }),  
 }
 
 export const myGitHubReducer = handleActions(reducer, initialState)
-export const myGitHubEpic = createAsyncEpic(PREFIX, getMyGitHubProfile);
+export const myGitHubEpic = createAsyncEpic(GITHUB_PREFIX, getMyGitHubProfile);

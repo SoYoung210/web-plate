@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime";
 import { createEpicMiddleware } from 'redux-observable';
 import { applyMiddleware, compose, createStore } from 'redux';
 import epics from '@/store/epics'
